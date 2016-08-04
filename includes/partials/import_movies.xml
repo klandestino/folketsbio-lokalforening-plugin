@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+  This sample shows what a request for movies
+  in the bioguiden system can look like.
+-->
+<document schema="MoviesExportSchema1_4.xsd">
+	<!--
+      	The values in the fields contained by this
+      	"information" element is to be set by the
+      	requesting system. The values are treated as
+      	strings by the Bioguiden system except for
+      	the "created" field that has to be a valid
+      	date and time. The values are not used for
+      	other than logging and back tracking purpose.
+  	-->
+	<information>
+  		<name>Folkets bio import</name>
+  		<description>Retrieve movies from the Bioguiden database at https://service.bioguiden.se</description>
+  		<log-id>c3f23168-7f3a-44fd-9bfd-28e0735d6c27</log-id>
+  		<created>CREATEDDATE</created>
+  		<server>Folkets bio</server>
+  		<ip>127.0.0.1</ip>
+	</information>
+	<data>
+    		<!--
+      		Retrieves all movies that have been updated
+      		since the given date and time.
+  		-->
+  		<movie-updated-date>UPDATEDDATE</movie-updated-date>
+	</data>
+</document>
