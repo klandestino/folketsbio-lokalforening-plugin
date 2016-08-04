@@ -124,7 +124,7 @@ class Fb_Movies_Import {
 
 		if ( $post_id ) :
 
-			$movie_id = get_post_meta( $post_id, 'org_fbse_id', true );
+			$movie_id = get_post_meta( $post_id, 'fbse_id', true );
 
 			$url = 'https://www.folketsbio.se/wp-json/wp/v2/visning?filter[post_parent]=' . $movie_id . '&filter[biograf]=' . $this->cinema_name . '&filter[date_query][after]=today';
 
@@ -243,7 +243,7 @@ class Fb_Movies_Import {
 
 			update_post_meta( $post, 'org_fbse_url', $json->link );
 
-			update_post_meta( $post, 'org_fbse_id', $json->id );
+			update_post_meta( $post, 'fbse_id', $json->id );
 
 			add_action( 'acf/save_post', array( $this, 'fix_acf' ), 99, 1 );
 

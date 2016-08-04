@@ -72,7 +72,7 @@ class Fb_Movies_CPT {
 			'menu_position'       => 5,
 			'show_in_admin_bar'   => false,
 			'show_in_nav_menus'   => false,
-			'can_export'          => true,
+			'can_export'          => false,
 			'has_archive'         => false,
 			'exclude_from_search' => true,
 			'publicly_queryable'  => false,
@@ -81,5 +81,4 @@ class Fb_Movies_CPT {
 		register_post_type( 'visning', $args );
 
 	}
-
 }
