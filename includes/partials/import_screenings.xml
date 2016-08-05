@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<document schema="RepertoireExportSchema1_3.xsd">
+	<data>
+		<start-date>STARTDATE</start-date>
+		<end-date>ENDDATE</end-date>
+	</data>
+</document>

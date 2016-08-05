@@ -6,12 +6,16 @@
 
 class Fb_Movies_Import {
 
-	// Cinema name
-	private $cinema_name;
+	// Username on bioguiden
+	private $username;
+
+	// Password on bioguiden
+	private $password;
 
 	public function __construct() {
 
-		$this->cinema_name = 'hagabion';
+		$this->username = get_field( 'bioguiden_anvandarnamn', 'options' );
+		$this->password = get_field( 'bioguiden_losenord', 'options' );
 
 	}
 
@@ -29,7 +33,7 @@ class Fb_Movies_Import {
 			// if so we only want to fetch screenings
 			if ( ! empty( get_post( $post_id )->post_content ) ) :
 
-				$this->fetch_film_screenings( $post_id );
+				$this->fetch_film_screenings();
 
 			else :
 
@@ -37,7 +41,7 @@ class Fb_Movies_Import {
 
 					update_post_meta( $post_id, 'bioguiden_fetched_info', true );
 
-					$this->fetch_film_screenings( $post_id );
+					$this->fetch_film_screenings();
 
 				else :
 
@@ -99,7 +103,7 @@ class Fb_Movies_Import {
 
 		$filmnummer = get_post_meta( $post_id, 'filmnummer', true );
 
-		if ( $film = $this->remote_post( 'https://www.folketsbio.se/wp-json/wp/v2/film?filter[meta_key]=filmnummer&filter[meta_value]=', $filmnummer ) ) :
+		if ( $film = $this->remote_get( 'https://www.folketsbio.se/wp-json/wp/v2/film?filter[meta_key]=bioguiden_id_full&filter[meta_value]=', $filmnummer ) ) :
 
 			return $this->save_movie_info( $film, $post_id );
 
@@ -112,62 +116,56 @@ class Fb_Movies_Import {
 	}
 
 	/**
-	 * Fetches screenings for a single movie if $post_id is passed to it
-	 * otherwise fetches screenings for all movies premiered withing the last 6 months
+	 * Fetches screenings for all movies premiered withing the last 12 months
 	 * runs via cron twice daily and when a new film is posted
 	 * @uses Fb_Movies_Import::create_film_screenings_xml
 	 * @uses Fb_Movies_Import::remote_post
 	 * @uses Fb_Movies_Import::save_screenings
-	 * @param $post_id int
 	 */
-	public function fetch_film_screenings( $post_id = false ) {
+	public function fetch_film_screenings() {
 
-		if ( $post_id ) :
+		$movies = new WP_Query( array(
+			'post_type' => 'film',
+			'posts_per_page' => -1,
+			'post_status' => array( 'publish', 'future', 'draft' ),
+			'date_query' => array( 'after' => '-12 month' ),
+			'meta_key' => 'filmnummer',
+			'meta_compare' => 'EXISTS',
+		) );
 
-			$movie_id = get_post_meta( $post_id, 'fbse_id', true );
+		$movie_id_and_filmnummer = array();
 
-			$url = 'https://www.folketsbio.se/wp-json/wp/v2/visning?filter[post_parent]=' . $movie_id . '&filter[biograf]=' . $this->cinema_name . '&filter[date_query][after]=today';
+		while ( $movies->have_posts() ) : $movies->the_post();
 
-			if ( $json = $this->remote_post( $url, '' ) ) :
+			$movie_id_and_filmnummer[ get_post_meta( get_the_ID(), 'filmnummer', true ) ] = get_the_ID();
 
-				$this->save_screenings( $json, $post_id );
+		endwhile;
 
-			else :
+		$xml = $this->create_film_screenings_xml();
 
-				return;
+		if ( $xml = $this->remote_post( 'https://service.bioguiden.se/repertoireexport.asmx', $xml ) ) :
 
-			endif;
+			$this->save_screenings( $xml, $movie_id_and_filmnummer );
 
 		else :
 
-			$movies = new WP_Query( array(
-				'post_type' => 'film',
-				'posts_per_page' => -1,
-				'post_status' => array( 'publish', 'future' ),
-				'date_query' => array( 'after' => '-12 month' ),
-				'meta_key' => 'fbse_id',
-				'meta_compare' => 'EXISTS',
-			) );
-
-			while ( $movies->have_posts() ) : $movies->the_post();
-
-				$movie_id = get_post_meta( $post_id, 'fbse_id', true );
-
-				$url = 'https://www.folketsbio.se/wp-json/wp/v2/visning?filter[post_parent]=' . $movie_id . '&filter[biograf]=' . $this->biograf_namn . '&filter[date_query][after]=today';
-
-				if ( $json = $this->remote_post( $url, '' ) ) :
-
-					$this->save_screenings( $json, $post_id );
-
-				else :
-
-					return;
-
-				endif;
-
-			endwhile;
+			return;
 
 		endif;
+
+	}
+
+	/**
+	 * Creates the xml to post to bioguiden from the sample file 'import_screenings'
+	 * @uses partials/import_screenings.xml
+	 */
+	private function create_film_screenings_xml() {
+
+		$xml = file_get_contents( 'partials/import_screenings.xml', FILE_USE_INCLUDE_PATH );
+		$xml = str_replace( 'STARTDATE', date( 'Y-m-d', strtotime( 'now' ) ). 'T' . date( 'h:i:s', strtotime( 'now' ) ), $xml );
+		$xml = str_replace( 'ENDDATE', date( 'Y-m-d', strtotime( '+6 month' ) ) . 'T' . date( 'h:i:s', strtotime( '+6 month' ) ), $xml );
+
+		return $xml;
 
 	}
 
@@ -181,6 +179,10 @@ class Fb_Movies_Import {
 	private function save_movie_info( $json, $post_id ) {
 
 		$json = json_decode( $json );
+		if ( empty( $json ) ) {
+			return false;
+		}
+
 		$json = $json[0];
 
 		$saved = false;
@@ -260,7 +262,7 @@ class Fb_Movies_Import {
 	 * @param $post_id int
 	 */
 	public function add_featured_image( $image_id, $post_id ) {
-		$image = $this->remote_post( 'https://www.folketsbio.se/wp-json/wp/v2/media/', $image_id );
+		$image = $this->remote_get( 'https://www.folketsbio.se/wp-json/wp/v2/media/', $image_id );
 		$image = json_decode( $image );
 		$image_url = $image->media_details->sizes->full->source_url;
 		$image_name = $image->media_details->sizes->full->file;
@@ -333,48 +335,109 @@ class Fb_Movies_Import {
 	 * @param $xml string
 	 * @param $parent_id int
 	 */
-	private function save_screenings( $json, $parent_id ) {
+	private function save_screenings( $xml, $movie_id_and_filmnummer ) {
 
-		$json = json_decode( $json );
-		if ( empty( $json ) ) {
-			return;
-		}
+		$xml = simplexml_load_string( $xml );
 
-		foreach ( $json as $screening ) :
+		foreach ( $xml->data->theatres->theatre as $theatre ) :
 
-			$booking_url = $screening->booking_url;
-			$screening_time = $screening->date;
-			$screening_id = $screening->id;
+			foreach ( $theatre->salons->salon as $salon ) :
 
-			if ( ! get_page_by_title( wp_strip_all_tags( $screening_id . $screening_time ), OBJECT, 'visning' ) ) :
-				$post = wp_insert_post( array(
-					'post_title' => wp_strip_all_tags( $screening_id . $screening_time ),
-					'post_status' => 'future',
-					'post_author' => 1,
-					'post_type' => 'visning',
-					'post_parent' => $parent_id,
-					'post_date' => $screening_time,
-				) );
-				if ( $post ) :
-					if ( $booking_url ) :
-						update_post_meta( $post, 'booking_url', $booking_url );
+				foreach( $salon->movie as $screening ) :
+
+					$full_movie_number = (string) $screening->{'full-movie-number'};
+
+					if ( ! array_key_exists( $full_movie_number, $movie_id_and_filmnummer ) ) {
+						continue;
+					} else {
+						$parent_id = $movie_id_and_filmnummer[ $full_movie_number ];
+					}
+
+					$start_time = (string) $screening->attributes()->{'start-time'};
+
+					$id = (string) $screening->attributes()->{'id'};
+
+					if ( ! empty( $screening->{'booking-url'} ) ) :
+
+						$booking_url = (string) $screening->{'booking-url'};
+
+					else :
+
+						$booking_url = false;
+
 					endif;
-				endif;
-			endif;
+
+					if ( ! get_page_by_title( wp_strip_all_tags( $id . $start_time ), OBJECT, 'visning' ) ) :
+
+						$post = wp_insert_post( array(
+							'post_title' => wp_strip_all_tags( $id . $start_time ),
+							'post_status' => 'future',
+							'post_author' => 1,
+							'post_type' => 'visning',
+							'post_parent' => $parent_id,
+							'post_date' => $start_time,
+						) );
+
+						if ( $post && $booking_url ) :
+
+							update_post_meta( $post, 'booking_url', $booking_url );
+
+						endif;
+
+					endif;
+
+				endforeach;
+
+			endforeach;
+
 		endforeach;
 
 	}
 
 	/**
 	 * Wrapper for wp_remote_get()
+	 * does a remote get to specified url
+	 * @param $url string
+	 * @param $xml string
+	 * @returns $str | bool
+	 */
+	private function remote_get( $url, $filmnummer ) {
+		$post = wp_remote_get(
+			$url . $filmnummer
+		);
+
+		if ( ! is_wp_error( $post ) && wp_remote_retrieve_response_code( $post ) == '200' ) :
+
+			return wp_remote_retrieve_body( $post );
+
+		else :
+
+			error_log( wp_remote_retrieve_response_message( $post ) );
+			return false;
+
+		endif;
+
+	}
+
+	/**
+	 * Wrapper for wp_remote_post()
 	 * does a remote post to specified url
 	 * @param $url string
 	 * @param $xml string
 	 * @returns $str | bool
 	 */
-	private function remote_post( $url, $filmnummer ) {
-		$post = wp_remote_get(
-			$url . $filmnummer
+	private function remote_post( $url, $xml ) {
+
+		$post = wp_remote_post(
+			$url,
+			array(
+				'httpversion' => '1.1',
+				'body' => array(
+					'username' => $this->username,
+					'password' => $this->password,
+					'xmlDocument' => $xml,
+				),
+			)
 		);
 
 		if ( ! is_wp_error( $post ) && wp_remote_retrieve_response_code( $post ) == '200' ) :
