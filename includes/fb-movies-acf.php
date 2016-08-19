@@ -146,6 +146,88 @@ acf_add_local_field_group(array (
 
 endif;
 
+if( function_exists('acf_add_local_field_group') ):
+
+acf_add_local_field_group(array (
+	'key' => 'group_57b58fad36314',
+	'title' => 'Visningar som inte finns i Bioguiden',
+	'fields' => array (
+		array (
+			'key' => 'field_57b58fbb7fb06',
+			'label' => 'Visning',
+			'name' => 'fb_visning',
+			'type' => 'repeater',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array (
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'collapsed' => '',
+			'min' => '',
+			'max' => '',
+			'layout' => 'table',
+			'button_label' => 'Lägg till visning',
+			'sub_fields' => array (
+				array (
+					'key' => 'field_57b58fd27fb07',
+					'label' => 'Datum och tid',
+					'name' => 'fb_visning_datum',
+					'type' => 'date_time_picker',
+					'instructions' => '',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array (
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'display_format' => 'Y-m-d H:i:s',
+					'return_format' => 'Y-m-d H:i:s',
+					'first_day' => 1,
+				),
+				array (
+					'key' => 'field_57b705b0b4df5',
+					'label' => 'Bokningslänk',
+					'name' => 'fb_visning_booking_url',
+					'type' => 'url',
+					'instructions' => '',
+					'required' => '',
+					'conditional_logic' => '',
+					'wrapper' => array (
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'default_value' => '',
+					'placeholder' => '',
+				),
+			),
+		),
+	),
+	'location' => array (
+		array (
+			array (
+				'param' => 'post_type',
+				'operator' => '==',
+				'value' => 'film',
+			),
+		),
+	),
+	'menu_order' => 0,
+	'position' => 'normal',
+	'style' => 'default',
+	'label_placement' => 'top',
+	'instruction_placement' => 'label',
+	'hide_on_screen' => '',
+	'active' => 1,
+	'description' => '',
+));
+
+endif;
+
 if( function_exists('acf_add_options_page') ) :
 
 	acf_add_options_page(array(
@@ -163,5 +245,5 @@ endif;
  * Remove ACF menu
  */
 function fb_movies_remove_menu_items() {
-	//remove_menu_page( 'edit.php?post_type=acf-field-group' );
+	remove_menu_page( 'edit.php?post_type=acf-field-group' );
 }
