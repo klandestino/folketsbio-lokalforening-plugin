@@ -12,7 +12,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Regissörer',
 			'singular_name' => 'Regissör',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 		'manus' => array(
 			'post_type' => array( 'film' ),
@@ -20,7 +20,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Manusförfattare',
 			'singular_name' => 'Manusförfattare',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 		'producent' => array(
 			'post_type' => array( 'film' ),
@@ -28,7 +28,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Producenter',
 			'singular_name' => 'Producent',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 		'skadespelare' => array(
 			'post_type' => array( 'film' ),
@@ -36,7 +36,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Med',
 			'singular_name' => 'Med',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 		'sprak' => array(
 			'post_type' => array( 'film' ),
@@ -44,7 +44,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Språk',
 			'singular_name' => 'Språk',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 		'land' => array(
 			'post_type' => array( 'film' ),
@@ -52,7 +52,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Länder',
 			'singular_name' => 'Land',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 		'genre' => array(
 			'post_type' => array( 'film' ),
@@ -60,7 +60,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Genrer',
 			'singular_name' => 'Genre',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 		'aldersgrans' => array(
 			'post_type' => array( 'film' ),
@@ -68,7 +68,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Åldergräns',
 			'singular_name' => 'Åldersgräns',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 		'produktionsar' => array(
 			'post_type' => array( 'film' ),
@@ -76,7 +76,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Produktionsår',
 			'singular_name' => 'Produktionsår',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 		'produkt' => array(
 			'post_type' => array( 'film' ),
@@ -84,7 +84,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Produkter',
 			'singular_name' => 'Produkt',
 			'public' => true,
-			'show_in_admin' => false
+			'show_in_admin' => false,
 		),
 		'undertexter' => array(
 			'post_type' => array( 'film' ),
@@ -92,7 +92,7 @@ function fb_movies_taxonomies() {
 			'name' => 'Undertexter',
 			'singular_name' => 'Undertexter',
 			'public' => true,
-			'show_in_admin' => true
+			'show_in_admin' => true,
 		),
 	);
 
@@ -122,7 +122,7 @@ function fb_movies_taxonomies() {
 			'hierarchical'               => false,
 			'public'                     => $taxonomy['public'],
 			'show_in_menu'  			 => $taxonomy['show_in_admin'],
-			'show_ui'					 => $taxonomy['show_in_admin']
+			'show_ui'					 => $taxonomy['show_in_admin'],
 		);
 		register_taxonomy( $taxonomy['slug'], $taxonomy['post_type'], $args );
 

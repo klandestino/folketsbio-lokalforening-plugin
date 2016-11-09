@@ -13,10 +13,10 @@
 // Import info about movie
 function fb_movies_save_post( $meta_id, $object_id, $meta_key, $meta_value ) {
 
-	if ( get_post_type( $object_id ) == 'film' && $meta_key == 'filmnummer' ) :
+	if ( 'film' === get_post_type( $object_id ) && 'filmnummer' === $meta_key ) :
 
-		$Fb_Movies_Import = New Fb_Movies_Import();
-		$Fb_Movies_Import->save_post( $object_id );
+		$fb_movies_import = new Fb_Movies_Import();
+		$fb_movies_import->save_post( $object_id );
 
 	endif;
 
@@ -25,7 +25,7 @@ function fb_movies_save_post( $meta_id, $object_id, $meta_key, $meta_value ) {
 // Adds error message if $_GET['bioguiden_error'] is true
 function fb_movies_admin_notice() {
 
-	if ( isset( $_GET['bioguiden_error'] ) && $_GET['bioguiden_error'] == true ) :
+	if ( isset( $_GET['bioguiden_error'] ) && true === $_GET['bioguiden_error'] ) :
 
 		Fb_Movies_Import::admin_notice();
 
@@ -36,8 +36,8 @@ function fb_movies_admin_notice() {
 // Run the importer via cron twicedaily
 function fb_movies_import_schedule() {
 
-	$Fb_Movies_Import = New Fb_Movies_Import();
-	$Fb_Movies_Import->fetch_film_screenings();
+	$fb_movies_import = new Fb_Movies_Import();
+	$fb_movies_import->fetch_film_screenings();
 
 }
 
@@ -55,20 +55,23 @@ function fb_movies_publish_instead_of_future_post_status( $id, $post ) {
 */
 function fb_movies_delete_connected_screenings( $post_id ) {
 
-	if ( get_post_type( $post_id ) == 'film' ) :
+	if ( 'film' === get_post_type( $post_id ) ) :
 
 		$screenings = new WP_Query( array(
 			'post_type' => 'visning',
 			'post_parent' => $post_id,
 			'posts_per_page' => -1,
-			'post_status' => 'any'
+			'post_status' => 'any',
 		) );
 
-		if ( $screenings->have_posts() ) : while ( $screenings->have_posts() ) : $screenings->the_post();
+		if ( $screenings->have_posts() ) :
+			while ( $screenings->have_posts() ) : $screenings->the_post();
 
-			wp_delete_post( get_the_ID(), true );
+				wp_delete_post( get_the_ID(), true );
 
-		endwhile; endif;
+			endwhile;
+		endif;
+		wp_reset_postdata();
 
 	endif;
 
@@ -86,11 +89,14 @@ function fb_movies_delete_old_shows() {
 		'date_query' => array( 'before' => '1 month ago' ),
 	) );
 
-	if ( $shows->have_posts() ) : while ( $shows->have_posts() ) : $shows->the_post();
+	if ( $shows->have_posts() ) :
+		while ( $shows->have_posts() ) : $shows->the_post();
 
-		wp_delete_post( get_the_ID(), true );
+			wp_delete_post( get_the_ID(), true );
 
-	endwhile; endif; wp_reset_postdata();
+		endwhile;
+	endif;
+	wp_reset_postdata();
 
 }
 

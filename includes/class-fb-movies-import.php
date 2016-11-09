@@ -45,7 +45,7 @@ class Fb_Movies_Import {
 
 				else :
 
-					if ( get_post_meta( $post_id, 'filmnummer', true ) != '' ) :
+					if ( get_post_meta( $post_id, 'filmnummer', true ) !== '' ) :
 
 						add_filter( 'redirect_post_location', array( $this, 'add_error_query_arg' ), 10, 1 );
 
@@ -214,7 +214,7 @@ class Fb_Movies_Import {
 
 			$saved = true;
 
-			if ( $json->featured_media !== 0 ) {
+			if ( 0 !== $json->featured_media ) {
 				$this->add_featured_image( $json->featured_media, $post );
 			}
 
@@ -343,7 +343,7 @@ class Fb_Movies_Import {
 
 			foreach ( $theatre->salons->salon as $salon ) :
 
-				foreach( $salon->movie as $screening ) :
+				foreach ( $salon->movie as $screening ) :
 
 					$full_movie_number = (string) $screening->{'full-movie-number'};
 
@@ -406,7 +406,7 @@ class Fb_Movies_Import {
 			$url . $filmnummer
 		);
 
-		if ( ! is_wp_error( $post ) && wp_remote_retrieve_response_code( $post ) == '200' ) :
+		if ( ! is_wp_error( $post ) && 200 === absint( wp_remote_retrieve_response_code( $post ) ) ) :
 
 			return wp_remote_retrieve_body( $post );
 
@@ -440,7 +440,7 @@ class Fb_Movies_Import {
 			)
 		);
 
-		if ( ! is_wp_error( $post ) && wp_remote_retrieve_response_code( $post ) == '200' ) :
+		if ( ! is_wp_error( $post ) && 200 === absint( wp_remote_retrieve_response_code( $post ) ) ) :
 
 			return wp_remote_retrieve_body( $post );
 

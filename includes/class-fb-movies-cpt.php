@@ -32,7 +32,7 @@ class Fb_Movies_CPT {
 			'label'               => 'film',
 			'description'         => 'Film',
 			'labels'              => $labels,
-			'supports'            => array( 'title', 'editor', 'thumbnail', ),
+			'supports'            => array( 'title', 'editor', 'thumbnail' ),
 			'hierarchical'        => false,
 			'public'              => true,
 			'show_ui'             => true,
@@ -58,13 +58,13 @@ class Fb_Movies_CPT {
 
 		$labels = array(
 			'name'                => 'Visningar',
-			'singular_name'       => 'Visning'
+			'singular_name'       => 'Visning',
 		);
 		$args = array(
 			'label'               => 'visning',
 			'description'         => 'Visning',
 			'labels'              => $labels,
-			'supports'            => array( ),
+			'supports'            => array(),
 			'hierarchical'        => false,
 			'public'              => false,
 			'show_ui'             => false,
