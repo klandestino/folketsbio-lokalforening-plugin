@@ -84,7 +84,7 @@ class Fb_Movies_Import {
 	}
 
 	/**
-	 * Adds an admin notice if we're not able to fetch info from bioguiden
+	 * Adds an admin notice if we're not able to fetch info from folketsbio.se
 	 */
 	public static function admin_notice() {
 
@@ -93,9 +93,9 @@ class Fb_Movies_Import {
 	}
 
 	/**
-	 * Fetches film info for a single movie from bioguiden
+	 * Fetches film info for a single movie from folketsbio.se
 	 * @uses Fb_Movies_Import::create_film_info_xml
-	 * @uses Fb_Movies_Import::remote_post
+	 * @uses Fb_Movies_Import::remote_get
 	 * @uses Fb_Movies_Import::save_movie_info
 	 * @param $post_id int
 	 */
@@ -103,7 +103,7 @@ class Fb_Movies_Import {
 
 		$filmnummer = get_post_meta( $post_id, 'filmnummer', true );
 
-		if ( $film = $this->remote_get( 'https://www.folketsbio.se/wp-json/wp/v2/film?filter[meta_key]=bioguiden_id_full&filter[meta_value]=', $filmnummer ) ) :
+		if ( $film = $this->remote_get( 'https://www.folketsbio.se/wp-json/wp/v2/film?filter[filmnummer]=', $filmnummer ) ) :
 
 			return $this->save_movie_info( $film, $post_id );
 
@@ -143,7 +143,7 @@ class Fb_Movies_Import {
 
 		$xml = $this->create_film_screenings_xml();
 
-		if ( $xml = $this->remote_post( 'https://service.bioguiden.se/repertoireexport.asmx', $xml ) ) :
+		if ( $xml = $this->remote_post( 'https://service.bioguiden.se/repertoireexport.asmx/Export', $xml ) ) :
 
 			$this->save_screenings( $xml, $movie_id_and_filmnummer );
 
@@ -162,6 +162,7 @@ class Fb_Movies_Import {
 	private function create_film_screenings_xml() {
 
 		$xml = file_get_contents( 'partials/import_screenings.xml', FILE_USE_INCLUDE_PATH );
+		$xml = str_replace( 'CREATEDDATE', date( 'Y-m-d', strtotime( 'now' ) ) . 'T' . date( 'h:i:s', strtotime( 'now' ) ), $xml );
 		$xml = str_replace( 'STARTDATE', date( 'Y-m-d', strtotime( 'now' ) ). 'T' . date( 'h:i:s', strtotime( 'now' ) ), $xml );
 		$xml = str_replace( 'ENDDATE', date( 'Y-m-d', strtotime( '+6 month' ) ) . 'T' . date( 'h:i:s', strtotime( '+6 month' ) ), $xml );
 
@@ -237,11 +238,17 @@ class Fb_Movies_Import {
 				}
 			}
 
-			update_post_meta( $post, 'org_originaltitel', $json->originaltitle );
+			if ( isset( $json->originaltitle ) ) :
+				update_post_meta( $post, 'org_originaltitel', $json->originaltitle );
+			endif;
 
-			update_post_meta( $post, 'org_langd', $json->length );
+			if ( isset( $json->length ) ) :
+				update_post_meta( $post, 'org_langd', $json->length );
+			endif;
 
-			update_post_meta( $post, 'org_trailer', $json->trailer_url );
+			if ( isset( $json->trailer_url ) ) :
+				update_post_meta( $post, 'org_trailer', $json->trailer_url );
+			endif;
 
 			update_post_meta( $post, 'org_fbse_url', $json->link );
 
@@ -272,7 +279,6 @@ class Fb_Movies_Import {
 		$upload_dir = wp_upload_dir();
 
 		if ( ! $image_data = file_get_contents( $image_url ) ) :
-			error_log( $post_id );
 			return false;
 		endif;
 

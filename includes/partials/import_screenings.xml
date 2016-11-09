@@ -1,6 +1,14 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="iso8859-1"?>
 
-<document schema="RepertoireExportSchema1_3.xsd">
+<document schema="RepertoireExportSchema1_4.xsd">
+    	<information>
+    		<name>Folkets bio import</name>
+    		<description>Retrieve screenings from the Bioguiden database at https://service.bioguiden.se</description>
+    		<log-id>c3f23168-7f3a-44fd-9bfd-28e0735d6c27</log-id>
+    		<created>CREATEDDATE</created>
+    		<server>Folkets bio</server>
+    		<ip>127.0.0.1</ip>
+    	</information>
 	<data>
 		<start-date>STARTDATE</start-date>
 		<end-date>ENDDATE</end-date>
