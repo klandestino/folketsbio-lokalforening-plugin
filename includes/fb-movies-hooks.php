@@ -42,11 +42,6 @@ add_action( 'fb_movies_cron', 'fb_movies_import_schedule' );
 add_action( 'add_meta_boxes_film', array( 'Fb_Movies_Meta_Box', 'add_meta_box' ) );
 
 /**
- * Remove ACF menu
- */
-add_action( 'admin_menu', 'fb_movies_remove_menu_items', 9999 );
-
-/**
  * Change post_status to publish when it's changed to future
  */
 add_action( 'future_film', 'fb_movies_publish_instead_of_future_post_status', 10, 2 );

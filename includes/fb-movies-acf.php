@@ -240,10 +240,3 @@ if( function_exists('acf_add_options_page') ) :
 	));
 
 endif;
-
-/**
- * Remove ACF menu
- */
-function fb_movies_remove_menu_items() {
-	remove_menu_page( 'edit.php?post_type=acf-field-group' );
-}
