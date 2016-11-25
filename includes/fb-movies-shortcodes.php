@@ -20,7 +20,7 @@ function fb_members_upcoming_screenings() {
 	] );
 
 	if ( $screenings->have_posts() ) :
-		echo '<table class="table">';
+		echo '<table class="table fb-movies-all-screenings">';
 		echo '<thead>';
 		echo '<tr>';
 		echo '<td>Film</td>';
@@ -30,8 +30,8 @@ function fb_members_upcoming_screenings() {
 		echo '<tbody>';
 		while ( $screenings->have_posts() ) : $screenings->the_post();
 			echo '<tr>';
-			echo '<td><a href="' . esc_url( get_the_permalink( wp_get_post_parent_id( get_the_ID() ) ) ) . '">' . get_the_title( wp_get_post_parent_id( get_the_ID() ) ) . '</a></td>';
 			echo '<td>' . get_the_date( 'j F H:i', get_the_ID() ) . '</td>';
+			echo '<td><a href="' . esc_url( get_the_permalink( wp_get_post_parent_id( get_the_ID() ) ) ) . '">' . get_the_title( wp_get_post_parent_id( get_the_ID() ) ) . '</a></td>';
 			echo '</tr>';
 		endwhile;
 		wp_reset_postdata();

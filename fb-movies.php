@@ -4,7 +4,7 @@
  * Plugin Name:       Folkets bios filmer
  * Plugin URI:        http://folketsbio.se
  * Description:       Funktionalitet för filmer.
- * Version:           0.2
+ * Version:           0.2.1
  * Author:            Klandestino AB
  * Author URI:        http://klandestino.se
  * License:           GPL-2.0+

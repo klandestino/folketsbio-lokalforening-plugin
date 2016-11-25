@@ -10,6 +10,8 @@ För att kunna uppdatera detta plugin via wp-admin så behöver du också instal
 ## Använda
 Pluginet skapar två posttyper, film och visning. För att importera data om en film från folketsbio.se och visningar från bioguiden så går du till Film->Lägg till och fyller i "Filmnummer (32-siffrigt)" och trycker sedan på spara utkast. Då kommer information om filmen att hämtas från folketsbio.se om den distribueras av Folkets bio, samt visningar från Bioguiden om din biograf har lagt in visningar där. Det går också bra att lägga till visningar manuellt ifall de inte är inlagda i Bioguiden.
 
+Pluginet registrerar även shortcoden `[fb_coming_screenings]` som kan användas för att skriva ut en tabell med alla kommande visningar.
+
 ## För utvecklare
 Visningar sparas som en dold posttyp med filmen som post_parent, så för att lista visningar på en enskild filmsida så gör typ:
 ```php
